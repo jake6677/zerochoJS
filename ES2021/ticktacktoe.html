@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>틱택토</title>
+<style>
+  table {
+    border-collapse: collapse;
+  }
+
+  td {
+    border: 1px solid black;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+  }
+</style>
+</head>
+
+<body>
+<script>
+    const { body } = document;
+    const $table = document.createElement('table');
+    const $result = document.createElement('div');
+    const rows = [];
+    let turn = 'O';
+
+    const checkWinner = (target) => {
+    const rowIndex = target.parentNode.rowIndex;
+    const cellIndex = target.cellIndex;
+
+    // rows.forEach((row, ri) => { 
+    //     row.forEach((cell, ci)=> {
+    //         if (cell === target) {
+    //             rowIndex = ri;
+    //             cellIndex = ci;
+    //         }
+    //     })
+    // }) 위쪽 두줄과 동일한 코드
+
+    // 세 칸 다 채워졌나?
+    let hasWinner = false;
+    // 가로줄 검사
+    if (
+      rows[rowIndex][0].textContent === turn &&
+      rows[rowIndex][1].textContent === turn &&
+      rows[rowIndex][2].textContent === turn
+    ) {
+      hasWinner = true;
+    }
+    // 세로줄 검사
+    if (
+      rows[0][cellIndex].textContent === turn &&
+      rows[1][cellIndex].textContent === turn &&
+      rows[2][cellIndex].textContent === turn
+    ) {
+      hasWinner = true;
+    }
+    // 대각선 검사
+    if (
+      rows[0][0].textContent === turn &&
+      rows[1][1].textContent === turn &&
+      rows[2][2].textContent === turn
+    ) {
+      hasWinner = true;
+    }
+    if (
+      rows[0][2].textContent === turn &&
+      rows[1][1].textContent === turn &&
+      rows[2][0].textContent === turn
+    ) {
+      hasWinner = true;
+    }
+    return hasWinner;
+  };
+
+    const callBack = (event)=>{
+        if (event.target.textContent){
+            return
+        }
+        event.target.textContent = turn;
+        if(checkWinner(event.target)) {
+            $table.removeEventListener("click", callBack);
+            $result.textContent = `${turn}승. 게임종료`;
+            return
+        };
+        // let draw = true;
+        // rows.forEach((row)=> {
+        //     row.forEach((cell)=> {
+        //         if (!cell.textContent) {
+        //             draw = false
+        //         }
+        //     })
+        // }) 아래의 코드1줄과 동일한 의미의 코드
+        let draw = rows.flat().every((td)=>td.textContent);
+        if (draw) {
+            $table.removeEventListener("click", callBack);
+            $result.textContent = `무승부. 게임종료`;
+        }
+        turn = (turn === "O" ? "X" : "O");
+    }
+    for (let i=0; i<3; i++){
+        const $tr = document.createElement('tr');
+        const cells = [];
+        for (let j=0; j<3; j++){
+            const $td = document.createElement('td');
+            cells.push($td);
+            $tr.append($td)
+        }
+        rows.push(cells)
+        $table.append($tr)
+    }
+    $table.addEventListener("click", callBack)
+    body.append($table)
+    body.append($result)
+</script>
+</body>
+</html>
