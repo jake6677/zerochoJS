@@ -1,0 +1,91 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>숫자야구</title>
+</head>
+<body>
+<form id="form">
+  <input type="text" id="input">
+  <button>확인</button>
+</form>
+<div id="logs"></div>
+<script>
+$input = document.querySelector('#input')
+$form = document.querySelector('#form')
+$logs = document.querySelector('#logs')
+
+const numbers = [];
+for (let n=0; n<9; n += 1) {
+	numbers.push(n+1);
+}
+
+const answer = [];
+for (let n=0; n<4; n+=1) {
+	const index = Math.floor(Math.random()*(numbers.length));
+	answer.push(numbers[index]);
+	numbers.splice(index, 1)
+}
+
+const tries = [];
+let outCount = 0;
+function checkInput(input) {
+	if (input.length !== 4) {
+		return alert('4자리 숫자를 입력해주세요.');
+	}
+	if (new Set(input).size !== 4) {
+		return alert('중복되지 않게 입력해주세요.');
+	}
+	if (tries.includes(input)) {
+		return alert('이미 시도한 값입니다.');
+	}
+	return true;
+	}
+
+const onSubmitEvent = (event) => {
+	if (tries.length === 10 || outCount === 3) {
+		removeEventListener("submit", onSubmitEvent);
+		return;
+	}
+	event.preventDefault();
+	const value = $input.value;
+	$input.value = '';
+	if (!checkInput(value)) {
+		return;
+	}
+	if (answer.join('') === value) {
+		$logs.append(`홈런! 정답은 ${answer.join('')}!`)
+		return
+	}
+	if (tries.length >= 9) {
+		const message = document.createTextNode(`패배! 정답은 ${answer.join('')}`);
+		$logs.appendChild(message);
+		tries.push(value);
+		return;
+	}
+	let strike = 0;
+	let ball = 0;
+	for (let n=0; n < answer.length; n += 1) {
+		const index = value.indexOf(answer[n])
+		if (index > -1){
+			if (index === n){
+				strike += 1;
+			} else {
+				ball += 1;
+			}
+		}
+	}
+	
+	if ((strike === 0) && (ball === 0)){
+		outCount += 1;
+		$logs.append(`${value} : ${outCount}아웃!`, document.createElement('br'));
+	} else {
+		$logs.append(`${value} : ${strike}스트라이크 ${ball}볼`, document.createElement('br'));
+	}
+	if (outCount === 3) {
+		$logs.append(`3아웃으로 게임패배! 정답은 ${answer.join('')}`)
+		return;
+	}
+	tries.push(value);
+}
+$form.addEventListener("submit", onSubmitEvent)
+</script>

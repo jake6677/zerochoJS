@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>반응속도</title>
+    <style>
+        #screen {
+            width: 300px;
+            height: 200px;
+            text-align: center;
+            user-select: none;
+        }
+
+        #screen.waiting {
+            background-color: aqua;
+        }
+
+        #screen.ready {
+            background-color: red;
+            color: white;
+        }
+
+        #screen.now {
+            background-color: greenyellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="screen" class="waiting">클릭해서 시작하세요</div>
+    <div id="result"></div>
+    <script>
+        const $screen = document.querySelector("#screen");
+        const $result = document.querySelector("#result");
+        let startTime;
+        let endTime;
+        const records = [];
+        let sum = 0;
+        let clickable = true;
+        let timeoutId;
+        let sortedRecords;
+        $screen.addEventListener("click", () => {
+            if ($screen.classList.contains('waiting')) {
+                $screen.classList.replace('waiting', 'ready');
+                $screen.textContent = "초록색이 되면 클릭하세요";
+                $result.textContent = "";
+                timeoutId = setTimeout(() => {
+                    $screen.classList.replace('ready', 'now');
+                    $screen.textContent = "클릭하세요!";
+                    startTime = new Date();
+
+                }, Math.floor(Math.random() * 1000 + 3000))
+            } else if ($screen.classList.contains('ready')) {
+                $screen.classList.replace('ready', 'waiting');
+                $screen.textContent = "다시 준비되면 클릭하세요";
+                $result.textContent = "너무 빨리눌렀어요. 다시해보세요.";
+                clearTimeout(timeoutId)
+            } else if ($screen.classList.contains('now')) {
+                endTime = new Date();
+                let diff = (endTime - startTime) / 1000;
+                records.push(diff);
+                $screen.classList.replace('now', 'waiting');
+                debugger;
+                $screen.textContent = "다시 준비되면 클릭하세요";
+                const average = Math.round(records.reduce((a, c) => (a + c)) / records.length * 1000) / 1000;
+                sortedRecords = records.sort((a,b)=>a-b).slice(0,5);
+                $result.append(`${diff}초 평균 : ${average}초`,document.createElement('br'));
+                sortedRecords.forEach((e, i) => {$result.append(`${i+1}위 : ${e}초`,document.createElement('br'))})
+                startTime = null;
+                endTime = null;
+            }
+        }
+        )
+    </script>
+</body>
+
+</html>
